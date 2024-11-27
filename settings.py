@@ -20,4 +20,3 @@ gridheight = height / tilesize
 
 # player settings
 player_speed = 100
-# this 8am
