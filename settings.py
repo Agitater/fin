@@ -10,7 +10,7 @@ yellow = (255, 255, 0)
 # game settings
 width = 1024
 height = 768
-fps = 60
+fps = 100
 title = "belly buddies"
 backgroundcolour = grey
 
@@ -19,4 +19,4 @@ gridwidth = width / tilesize
 gridheight = height / tilesize
 
 # player settings
-player_speed = 100
+player_speed = 300
