@@ -4,6 +4,7 @@ import random
 from os import path
 from settings import *
 from sprites import *
+from tilemap import *
 
 class Game:
     def __init__(self):
@@ -16,22 +17,22 @@ class Game:
 
     def load_data(self):
         game_folder = path.dirname(__file__)
-        self.map_data = []
-        with open(path.join(game_folder, "map.txt"), "rt") as f:
-            for line in f:
-                self.map_data.append(line)
+        img_folder = path.join(game_folder, "assets")
+        self.map = Map(path.join(game_folder, "map.txt"))
+        self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
 
     def new(self):
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        for row, tiles in enumerate(self.map_data):
+        for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == "1":
                     Wall(self, col, row)
                 if tile == "P":
                     self.player = Player(self, col, row)
+        self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
         # game loop - set self.playing = False to end the game
@@ -49,8 +50,10 @@ class Game:
     def update(self):
         # update portion of the game loop
         self.all_sprites.update()
+        self.camera.update(self.player)
 
     def draw_grid(self):
+        pg.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         for x in range(0, width, tilesize):
             pg.draw.line(self.screen, lgrey, (x, 0), (x, height))
         for y in range(0, height, tilesize):
@@ -59,7 +62,9 @@ class Game:
     def draw(self):
         self.screen.fill(backgroundcolour)
         self.draw_grid()
-        self.all_sprites.draw(self.screen)
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
+#            pg.draw.rect(self.screen, white, self.camera.apply(self.player, 2))
         pg.display.flip()
 
     def events(self):
